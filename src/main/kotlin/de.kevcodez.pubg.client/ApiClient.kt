@@ -44,9 +44,10 @@ class ApiClient(private val apiKey: String, private val httpClient: OkHttpClient
         val request = buildRequest(urlBuilder.build())
 
         val response = httpClient.newCall(request).execute()
+        val bodyAsString = response.body()!!.string()
         validateResponse(response)
 
-        return objectMapper.readValue(response.body()!!.string(), PlayerResponse::class.java)
+        return objectMapper.readValue(bodyAsString, PlayerResponse::class.java)
     }
 
     fun getPlayers(region: Region, playerFilter: PlayerFilter): PlayersResponse {
@@ -70,9 +71,10 @@ class ApiClient(private val apiKey: String, private val httpClient: OkHttpClient
         val request = buildRequest(urlBuilder.build())
 
         val response = httpClient.newCall(request).execute()
+        val bodyAsString = response.body()!!.string()
+
         validateResponse(response)
 
-        val bodyAsString = response.body()!!.string()
         return objectMapper.readValue(bodyAsString, PlayersResponse::class.java)
     }
 
@@ -88,9 +90,10 @@ class ApiClient(private val apiKey: String, private val httpClient: OkHttpClient
         val request = buildRequest(urlBuilder.build())
 
         val response = httpClient.newCall(request).execute()
+        val bodyAsString = response.body()!!.string()
+
         validateResponse(response)
 
-        val bodyAsString = response.body()!!.string()
         return objectMapper.readValue(bodyAsString, MatchResponse::class.java)
     }
 
@@ -100,9 +103,11 @@ class ApiClient(private val apiKey: String, private val httpClient: OkHttpClient
         val request = buildRequest(httpUrl)
 
         val response = httpClient.newCall(request).execute()
+        val bodyAsString = response.body()!!.string()
+
         validateResponse(response)
 
-        return objectMapper.readValue(response.body()!!.string(), object : TypeReference<List<TelemetryEvent>>() {})
+        return objectMapper.readValue(bodyAsString, object : TypeReference<List<TelemetryEvent>>() {})
     }
 
     fun getSeasons(region: Region): SeasonResponse {
@@ -116,9 +121,10 @@ class ApiClient(private val apiKey: String, private val httpClient: OkHttpClient
         val request = buildRequest(urlBuilder.build())
 
         val response = httpClient.newCall(request).execute()
+        val bodyAsString = response.body()!!.string()
+
         validateResponse(response)
 
-        val bodyAsString = response.body()!!.string()
         return objectMapper.readValue(bodyAsString, SeasonResponse::class.java)
     }
 
@@ -131,9 +137,10 @@ class ApiClient(private val apiKey: String, private val httpClient: OkHttpClient
         val request = buildRequest(urlBuilder.build())
 
         val response = httpClient.newCall(request).execute()
+        val bodyAsString = response.body()!!.string()
+
         validateResponse(response)
 
-        val bodyAsString = response.body()!!.string()
         return objectMapper.readValue(bodyAsString, TournamentsResponse::class.java)
     }
 
@@ -147,9 +154,10 @@ class ApiClient(private val apiKey: String, private val httpClient: OkHttpClient
         val request = buildRequest(urlBuilder.build())
 
         val response = httpClient.newCall(request).execute()
+        val bodyAsString = response.body()!!.string()
+
         validateResponse(response)
 
-        val bodyAsString = response.body()!!.string()
         return objectMapper.readValue(bodyAsString, TournamentResponse::class.java)
     }
 
@@ -163,9 +171,11 @@ class ApiClient(private val apiKey: String, private val httpClient: OkHttpClient
         val request = buildRequest(urlBuilder.build())
 
         val response = httpClient.newCall(request).execute()
+        val bodyAsString = response.body()!!.string()
+
         validateResponse(response)
 
-        return objectMapper.readValue(response.body()!!.string(), Status::class.java)
+        return objectMapper.readValue(bodyAsString, Status::class.java)
     }
 
     private fun buildRequest(url: HttpUrl): Request {
@@ -177,8 +187,26 @@ class ApiClient(private val apiKey: String, private val httpClient: OkHttpClient
     }
 
     private fun validateResponse(response: Response) {
+        response.body()!!.close()
         if (!response.isSuccessful) {
-            throw ApiException(response)
+            val respCode = response.code()
+            when (respCode) {
+                401 -> {
+                    throw ApiException(respCode, "API key invalid or missing")
+                }
+                404 -> {
+                    throw ApiException(respCode, "The requested source was not found")
+                }
+                415 -> {
+                    throw ApiException(respCode, "Content type incorrect or not specified")
+                }
+                429 -> {
+                    throw ApiException(respCode, "Too many requests")
+                }
+                else -> {
+                    throw ApiException(respCode, "Unknown error!")
+                }
+            }
         }
     }
 
