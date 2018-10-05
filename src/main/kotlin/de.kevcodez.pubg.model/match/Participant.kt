@@ -1,7 +1,7 @@
 package de.kevcodez.pubg.model.match
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 open class Participant : MatchObject() {
     var id: String = ""
     var actor: String = ""
@@ -26,8 +26,6 @@ data class ParticipantStats(
     val headshotKills: Int,
     val heals: Int,
     val killPlace: Int,
-    val killPoints: Int,
-    val killPointsDelta: Int,
     val killStreaks: Int,
     val kills: Int,
     val lastKillPoints: Int,
@@ -45,7 +43,6 @@ data class ParticipantStats(
     val walkDistance: Double,
     val weaponsAcquired: Int,
     val winPlace: Int,
-    val winPoints: Int,
-    val winPointsDelta: Double,
-    val swimDistance: Double
+    val swimDistance: Double,
+    val rankPoints: Int
 )
