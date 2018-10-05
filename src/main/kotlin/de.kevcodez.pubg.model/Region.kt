@@ -15,6 +15,9 @@ enum class Region(val identifier: String) {
     PC_KAKAO("pc-kakao"),
     PC_SOUTH_EATH_ASIA("pc-sea"),
     PC_SOUTH_AMERICA("pc-sa"),
-    PC_ASIA("pc-as")
+    PC_ASIA("pc-as"),
+    PC_TOURNAMENT("pc-tournament"),
+    STEAM("steam"),
+    KAKAO("kakao")
 
 }
