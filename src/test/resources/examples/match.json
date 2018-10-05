@@ -11,7 +11,8 @@
       "duration": 1374,
       "stats": null,
       "tags": null,
-      "isCustomMatch": false
+      "isCustomMatch": false,
+      "SeasonState": "prepare"
     },
     "relationships": {
       "assets": {
